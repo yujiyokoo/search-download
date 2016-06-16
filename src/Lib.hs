@@ -5,9 +5,6 @@ module Lib
     , searchUrl
     , decodeSearchResults
     , getOneId
-
-    , smallTest
-
     ) where
 
 import qualified Data.ByteString.Lazy as B
@@ -34,8 +31,6 @@ callSearch search_url = simpleHttp search_url
 decodeSearchResults :: B.ByteString -> Either String SnippetResults
 decodeSearchResults = eitherDecode
 
-smallTest x = eitherDecode x :: Either String SnippetResults
-
 -- This should switch to using monad for errors
 getOneId :: SnippetResults -> String
 getOneId (SnippetResults [])  = ""
@@ -52,7 +47,7 @@ data SnippetResult =
 -- For nested object parsing: http://stackoverflow.com/questions/24742872/parsing-an-array-with-haskell-aeson#24743369
 instance FromJSON SnippetResults where
   parseJSON jsn = case jsn of
-    Object v -> (v .: "items") >>= fmap SnippetResults . parseJSON
+    Object v -> (v .: "items") >>= (fmap SnippetResults) . parseJSON
     x -> fail $ "unexpected json: " ++ show x
 
 instance FromJSON SnippetResult where
