@@ -1,4 +1,4 @@
-# search-download, a simle Youtube API search tool in Haskell
+# search-download, a simple Youtube API search tool in Haskell
 
 This is a simple shell tool written in Haskell for using youtube API to search for your keyword.
 
@@ -19,7 +19,7 @@ It is written in Haskell.
 You will probably need stackage working on your machine to build this.
 
 ```
-> stack inint
+> stack init
 
 > stack setup
 
