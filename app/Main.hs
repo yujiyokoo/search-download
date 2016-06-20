@@ -33,20 +33,21 @@ getDownloadUrl vidId =
 
 main :: IO ()
 main = do
+  -- Generate search url
   a <- cmdArgs cmdargs
   let searchUrl = getSearchUrl (keyword a) (key a)
   putStrLn ("searching " ++ searchUrl)
 
+  -- Call API for search
   results_json <- callSearch searchUrl
   let results = decodeSearchResults results_json
-  let vidId = (liftM getOneId) results
 
+  -- Generate download url
+  let vidId = (liftM getOneId) results
   let downloadUrl = getDownloadUrl vidId
   putStrLn ("downloading " ++ downloadUrl)
-  let message = "downloading the fuck out of " ++ downloadUrl
-  putStrLn (show message)
 
-  -- do the call to download
+  -- Call youtube-dl to perform the download
   output <- readProcess "youtube-dl" (options (format a) ++ [downloadUrl]) []
   putStrLn (output)
   -- callSearch url >>= putStrLn . show . decodeSearchResults
