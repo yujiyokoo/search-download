@@ -32,8 +32,10 @@ getDownloadUrl vidId =
 
 main :: IO ()
 main = do
-  -- Generate search url
+  -- Extract cmd args
   a <- cmdArgs cmdargs
+
+  -- Generate search url
   let searchUrl = getSearchUrl (keyword a) (key a)
   putStrLn ("searching " ++ searchUrl)
 
