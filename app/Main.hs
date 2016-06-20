@@ -30,6 +30,10 @@ getDownloadUrl :: String -> String
 getDownloadUrl vidId =
   "https://www.youtube.com/watch?v=" ++ (H.urlEncode vidId)
 
+execDownload :: [String] -> IO String
+execDownload options =
+  readProcess "youtube-dl" options []
+
 main :: IO ()
 main = do
   -- Extract cmd args
@@ -44,10 +48,13 @@ main = do
 
   -- Generate download url
   let downloadUrlE = fmap (getDownloadUrl . getOneId) results
-  let downloadUrl = either (const "") id downloadUrlE
-  putStrLn ("downloading " ++ downloadUrl)
+  output <- case downloadUrlE of
+    Left message -> return message
+    Right downloadUrl -> do
+      putStrLn ("downloading " ++ downloadUrl)
 
-  -- Call youtube-dl to perform the download
-  output <- readProcess "youtube-dl" (options (format a) ++ [downloadUrl]) []
+      -- Call youtube-dl to perform the download
+      let processOptions = (options (format a)) ++ [downloadUrl]
+      execDownload processOptions
+
   putStrLn (output)
-  -- callSearch url >>= putStrLn . show . decodeSearchResults
