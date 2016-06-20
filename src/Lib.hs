@@ -27,8 +27,13 @@ getSearchUrl query api_key =
     "&q=" ++ (H.urlEncode query) ++
     "&key=" ++ (H.urlEncode api_key)
 
-callSearch :: String -> IO B.ByteString
-callSearch search_url = simpleHttp search_url
+callSearch :: String -> IO (Either String SnippetResults)
+callSearch searchUrl = do
+  results <- httpCall searchUrl
+  return (decodeSearchResults results)
+  where
+    httpCall :: String -> IO B.ByteString
+    httpCall = simpleHttp
 
 decodeSearchResults :: B.ByteString -> Either String SnippetResults
 decodeSearchResults = eitherDecode

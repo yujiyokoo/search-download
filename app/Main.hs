@@ -40,8 +40,7 @@ main = do
   putStrLn ("searching " ++ searchUrl)
 
   -- Call API for search
-  results_json <- callSearch searchUrl
-  let results = decodeSearchResults results_json
+  results <- callSearch searchUrl
 
   -- Generate download url
   let downloadUrlE = fmap (getDownloadUrl . getOneId) results
