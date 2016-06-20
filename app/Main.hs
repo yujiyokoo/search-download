@@ -26,8 +26,12 @@ options audioFormat = case audioFormat of
   "mp3" -> ["-x", "--audio-format=mp3"]
   _ -> []
 
-main :: IO ()
+getDownloadUrl vidId =
+  either (const "") id videoUrl
+  where
+    videoUrl = liftM2 (++) (Right "https://www.youtube.com/watch?v=") ((liftM H.urlEncode) vidId)
 
+main :: IO ()
 main = do
   a <- cmdArgs cmdargs
   let searchUrl = getSearchUrl (keyword a) (key a)
@@ -36,10 +40,13 @@ main = do
   results_json <- callSearch searchUrl
   let results = decodeSearchResults results_json
   let vidId = (liftM getOneId) results
-  let videoUrl = liftM2 (++) (Right "https://www.youtube.com/watch?v=") ((liftM H.urlEncode) vidId)
-  let message = liftM2 (++) (Right "downloading ") videoUrl
+
+  let downloadUrl = getDownloadUrl vidId
+  putStrLn ("downloading " ++ downloadUrl)
+  let message = "downloading the fuck out of " ++ downloadUrl
   putStrLn (show message)
-  let actualUrl = either (const "") id videoUrl
-  output <- readProcess "youtube-dl" (options (format a) ++ [actualUrl]) []
+
+  -- do the call to download
+  output <- readProcess "youtube-dl" (options (format a) ++ [downloadUrl]) []
   putStrLn (output)
   -- callSearch url >>= putStrLn . show . decodeSearchResults
