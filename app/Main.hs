@@ -30,9 +30,10 @@ main :: IO ()
 
 main = do
   a <- cmdArgs cmdargs
-  let url = (searchUrl (keyword a) (key a))
-  putStrLn ("searching " ++ url)
-  results_json <- callSearch url
+  let searchUrl = getSearchUrl (keyword a) (key a)
+  putStrLn ("searching " ++ searchUrl)
+
+  results_json <- callSearch searchUrl
   let results = decodeSearchResults results_json
   let vidId = (liftM getOneId) results
   let videoUrl = liftM2 (++) (Right "https://www.youtube.com/watch?v=") ((liftM H.urlEncode) vidId)
