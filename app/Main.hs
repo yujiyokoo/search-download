@@ -42,9 +42,7 @@ main = do
   let results = decodeSearchResults results_json
 
   -- Generate download url
-  let vidIdE = (liftM getOneId) results
-  let downloadUrlE = fmap getDownloadUrl vidIdE
-
+  let downloadUrlE = fmap (getDownloadUrl . getOneId) results
   let downloadUrl = either (const "") id downloadUrlE
   putStrLn ("downloading " ++ downloadUrl)
 
