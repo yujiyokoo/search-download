@@ -26,13 +26,12 @@ options audioFormat = case audioFormat of
   "mp3" -> ["-x", "--audio-format=mp3"]
   _ -> []
 
-getDownloadUrl :: String -> String
-getDownloadUrl vidId =
-  "https://www.youtube.com/watch?v=" ++ (H.urlEncode vidId)
 
-execDownload :: [String] -> IO String
-execDownload options =
-  readProcess "youtube-dl" options []
+download :: [String] -> String -> IO String
+download args downloadUrl = do
+  putStrLn ("downloading " ++ downloadUrl)
+  let cmdLineArgs = args ++ [downloadUrl]
+  readProcess "youtube-dl" cmdLineArgs []
 
 main :: IO ()
 main = do
@@ -48,13 +47,7 @@ main = do
 
   -- Generate download url
   let downloadUrlE = fmap (getDownloadUrl . getOneId) results
-  output <- case downloadUrlE of
-    Left message -> return message
-    Right downloadUrl -> do
-      putStrLn ("downloading " ++ downloadUrl)
-
-      -- Call youtube-dl to perform the download
-      let processOptions = (options (format a)) ++ [downloadUrl]
-      execDownload processOptions
-
+  let parsedArgs = options (format a)
+  output <- either (return . id) (download parsedArgs) downloadUrlE
   putStrLn (output)
+

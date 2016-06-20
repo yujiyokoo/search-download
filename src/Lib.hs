@@ -3,6 +3,7 @@
 module Lib
     ( callSearch
     , getSearchUrl
+    , getDownloadUrl
     , decodeSearchResults
     , getOneId
     ) where
@@ -18,15 +19,16 @@ import GHC.Generics
 
 --------------------------------------
 
-youtubeUrl :: String
-youtubeUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet"
-
 getSearchUrl :: String -> String -> String
 getSearchUrl query api_key =
-  youtubeUrl ++
+  "https://www.googleapis.com/youtube/v3/search?part=snippet" ++
     "&q=" ++ (H.urlEncode query) ++
     "&key=" ++ (H.urlEncode api_key)
 
+getDownloadUrl :: String -> String
+getDownloadUrl vidId =
+  "https://www.youtube.com/watch" ++
+    "?v=" ++ (H.urlEncode vidId)
 callSearch :: String -> IO (Either String SnippetResults)
 callSearch searchUrl = do
   results <- httpCall searchUrl
