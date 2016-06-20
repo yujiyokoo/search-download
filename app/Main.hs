@@ -26,10 +26,9 @@ options audioFormat = case audioFormat of
   "mp3" -> ["-x", "--audio-format=mp3"]
   _ -> []
 
+getDownloadUrl :: String -> String
 getDownloadUrl vidId =
-  either (const "") id videoUrl
-  where
-    videoUrl = liftM2 (++) (Right "https://www.youtube.com/watch?v=") ((liftM H.urlEncode) vidId)
+  "https://www.youtube.com/watch?v=" ++ (H.urlEncode vidId)
 
 main :: IO ()
 main = do
@@ -43,8 +42,10 @@ main = do
   let results = decodeSearchResults results_json
 
   -- Generate download url
-  let vidId = (liftM getOneId) results
-  let downloadUrl = getDownloadUrl vidId
+  let vidIdE = (liftM getOneId) results
+  let downloadUrlE = fmap getDownloadUrl vidIdE
+
+  let downloadUrl = either (const "") id downloadUrlE
   putStrLn ("downloading " ++ downloadUrl)
 
   -- Call youtube-dl to perform the download
