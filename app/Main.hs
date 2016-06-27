@@ -43,11 +43,16 @@ main = do
   putStrLn ("searching " ++ searchUrl)
 
   -- Call API for search
-  results <- callSearch searchUrl
+  -- Either a list of results, or fail
+  resultsE <- callSearch searchUrl
+
+  -- Join flattens the inner either produced by getOneId
+  let resultE = join $ getOneId <$> resultsE
 
   -- Generate download url
-  let downloadUrlE = fmap (getDownloadUrl . getOneId) results
+  let downloadUrlE = getDownloadUrl <$> resultE
   let parsedArgs = options (format a)
   output <- either (return . id) (download parsedArgs) downloadUrlE
+
   putStrLn (output)
 

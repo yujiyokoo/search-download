@@ -29,6 +29,7 @@ getDownloadUrl :: String -> String
 getDownloadUrl vidId =
   "https://www.youtube.com/watch" ++
     "?v=" ++ (H.urlEncode vidId)
+
 callSearch :: String -> IO (Either String SnippetResults)
 callSearch searchUrl = do
   results <- httpCall searchUrl
@@ -40,10 +41,9 @@ callSearch searchUrl = do
 decodeSearchResults :: B.ByteString -> Either String SnippetResults
 decodeSearchResults = eitherDecode
 
--- This should switch to using monad for errors
-getOneId :: SnippetResults -> String
-getOneId (SnippetResults [])  = ""
-getOneId (SnippetResults (x:xs)) = videoId x
+getOneId :: SnippetResults -> Either String String
+getOneId (SnippetResults [])  = Left "No results" 
+getOneId (SnippetResults (x:xs)) = Right (videoId x)
 
 data SnippetResults =
   SnippetResults [ SnippetResult ] deriving Show
